@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+	
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	
+	<!--namespace에서 context mybatis-spring 체크 후  dbcp 설정 -->
+	
+	
+	<!-- dbcp 설정 암기 -->
+	
+	
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	
+	<!--  classpath란 자방 가상머신이 프로그램을 실행할 때 Class 파일을 찾느데 기준이 되는 경로다.
+	classpath:는  classpath:의 위치가 2곳 나타나 있다 src/main/java/, src/main/resources/ 
+	resources 하위에 있으면 resources -->
+	
+	
+	
+	<!-- context:property-placeholder 태그는 location 속성으로 지정한 프로퍼티 파일로부터 정보를 읽어와 빈 설정에 입력한 플레이스 홀더의 값을 프로퍼티 파일에 존재하는 값으로 변경한다.
+	java 하위에 설정하고 싶으면 java로 설정하면 claspath 위치 시킬 수 있다. -->
+	<context:property-placeholder location="classpath:jdbc.properties"/>
+	
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${oracle.dev.driver}"/>
+		<property name="url" value="${oracle.dev.url}"/>
+		<property name="username" value="${oracle.dev.username}"/>
+		<property name="password" value="${oracle.dev.password}"/>
+		<property name="defaultAutoCommit" value="false"></property>
+	
+	</bean>
+	
+	<!-- sqlSessionFactory는  데이터베이스와의 연결과 sql의 실행에 대한 모든 것을 가진 가장 중요한 객체다.
+	이 객체가 DataSource를 참조하여 MyBatis와  dbms 서버를 연동시켜준다.-->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		
+		<property name="configLocation" value="classpath:mybatis-config.xml"/>	
+		<property name="dataSource" ref="dataSource"/>	
+	</bean>
+	
+	<!--  마이바티스에서는 SqlSession를 생성하기 위해 SqlSessionFactory를 사용한다. 세션을 한번 생성하면 매핑구문을 실행하거나 커밋 또는 롤백을 하기 위해 세션을 사용할수 있다. 마지막으로 더 이상 필요하지 않은 상태가 되면 세션을 닫는다. -->
+	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+	<!-- 생성자를 통한  주입 -->
+		<constructor-arg ref="sqlSessionFactory"/>
+	</bean>
+	
+	<mybatis-spring:scan base-package="com.lsy.myapp.dao"/>
+	
+</beans>
